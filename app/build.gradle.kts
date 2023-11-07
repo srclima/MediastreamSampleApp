@@ -116,5 +116,5 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-ima:$mediaVersion")
     implementation("androidx.media3:media3-exoplayer-smoothstreaming:$mediaVersion")*/
 
-    implementation("io.github.mediastream:mediastreamplatformsdkandroid:b9.0.2")
+    implementation("io.github.mediastream:mediastreamplatformsdkandroid:b9.0.5")
 }
