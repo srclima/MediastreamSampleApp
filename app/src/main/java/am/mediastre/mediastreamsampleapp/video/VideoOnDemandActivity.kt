@@ -24,10 +24,11 @@ class VideoOnDemandActivity : AppCompatActivity() {
         config.environment = MediastreamPlayerConfig.Environment.DEV
         config.isDebug = true
         config.trackEnable = false
+        config.castAvailable = true
         playerView = findViewById(R.id.player_view)
         container = findViewById(R.id.main_media_frame)
 
-        player = MediastreamPlayer(this, config, container, playerView)
+        player = MediastreamPlayer(this, config, container, playerView, supportFragmentManager)
     }
 
     override fun onDestroy() {
