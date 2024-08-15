@@ -1,5 +1,6 @@
 package am.mediastre.mediastreamsampleapp.video
 
+import am.mediastre.mediastreamplatformsdkandroid.MediastreamMiniPlayerConfig
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayer
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerConfig
 import am.mediastre.mediastreamsampleapp.R
@@ -18,10 +19,11 @@ class VideoLiveDvrActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_videoplayer)
         val config = MediastreamPlayerConfig()
-        config.id = "5d0ba11f9e9ae30a45605689"
+        val miniPlayerConfig = MediastreamMiniPlayerConfig()
+        config.id = "CONTENT_ID"
+        config.accountID = "ACCOUNT_ID"
         config.type = MediastreamPlayerConfig.VideoTypes.LIVE
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.DASH
-        config.environment = MediastreamPlayerConfig.Environment.DEV
         config.isDebug = true
         config.trackEnable = false
         config.dvr = true
@@ -32,7 +34,7 @@ class VideoLiveDvrActivity : AppCompatActivity() {
         playerView = findViewById(R.id.player_view)
         container = findViewById(R.id.main_media_frame)
 
-        player = MediastreamPlayer(this, config, container, playerView)
+        player = MediastreamPlayer(this, config, container, playerView, miniPlayerConfig)
     }
 
     override fun onDestroy() {

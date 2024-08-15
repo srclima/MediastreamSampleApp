@@ -1,5 +1,6 @@
 package am.mediastre.mediastreamsampleapp.audio
 
+import am.mediastre.mediastreamplatformsdkandroid.MediastreamMiniPlayerConfig
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayer
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerConfig
 import am.mediastre.mediastreamsampleapp.R
@@ -18,18 +19,18 @@ class AudioLiveActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
         val config = MediastreamPlayerConfig()
+        val miniPlayerConfig = MediastreamMiniPlayerConfig()
+
         config.accountID = "5eab1eae242ae06e2e4ad169"
         config.id = "60b64087ed5d7841223f732e"
         config.type = MediastreamPlayerConfig.VideoTypes.LIVE
-        config.environment = MediastreamPlayerConfig.Environment.DEV
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.DEFAULT
         config.adURL = "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/vmap_ad_samples&sz=640x480&cust_params=sample_ar%3Dpreonly&ciu_szs=300x250%2C728x90&gdfp_req=1&ad_rule=1&output=vmap&unviewed_position_start=1&env=vp&impl=s&correlator="
         config.isDebug = true
         config.trackEnable = true
         playerView = findViewById(R.id.player_view)
         container = findViewById(R.id.main_media_frame)
-
-        player = MediastreamPlayer(this, config, container, playerView)
+        player = MediastreamPlayer(this, config, container, playerView, miniPlayerConfig)
     }
 
     override fun onDestroy() {

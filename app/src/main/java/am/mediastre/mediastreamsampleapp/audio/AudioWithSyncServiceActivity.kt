@@ -3,12 +3,14 @@ package am.mediastre.mediastreamsampleapp.audio
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamMiniPlayerConfig
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerCallback
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerConfig
-import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerService
+import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerServiceWithSync
 import am.mediastre.mediastreamsampleapp.R
+import android.Manifest
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -16,15 +18,13 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.graphics.Color
-import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.ui.PlayerView
 import com.google.ads.interactivemedia.v3.api.AdError
 import com.google.ads.interactivemedia.v3.api.AdEvent
 import org.json.JSONObject
 
-class AudioOnDemandAsServiceActivity : AppCompatActivity() {
+class AudioWithSyncServiceActivity : AppCompatActivity() {
 
     private val TAG = "SampleApp"
     private lateinit var container: FrameLayout
@@ -33,25 +33,32 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
     private lateinit var miniPlayerConfig: MediastreamMiniPlayerConfig
 
     private var mBound: Boolean = false
-    private lateinit var mService: MediastreamPlayerService
+    private lateinit var mService: MediastreamPlayerServiceWithSync
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioasserviceplayer)
         val config = MediastreamPlayerConfig()
-        config.accountID = "5fbfd5b96660885379e1a129"
-        config.id = "646e3d4d5c910108b684a2b0"
-        config.type = MediastreamPlayerConfig.VideoTypes.VOD
-        config.playerType = MediastreamPlayerConfig.PlayerType.AUDIO
-        config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
-        //config.environment = MediastreamPlayerConfig.Environment.DEV
+        config.id = "5d4a071c37beb90719a41611"
+        config.accountID = "5faaeb72f92d7b07dfe10181"
+        config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
+        config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
         config.isDebug = true
         config.trackEnable = false
         config.showControls = true
+        config.loadNextAutomatically = true
         config.appName = "MediastreamAppTest"
         playerView = findViewById(R.id.player_view)
         container = findViewById(R.id.main_media_frame)
+
+        if (
+            Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), /* requestCode= */ 0)
+        }
 
         setupButtons()
 //        player = MediastreamPlayer(this, config, container, playerView)
@@ -70,10 +77,13 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
          * Called after a successful bind with our VideoService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as MediastreamPlayerService.VideoServiceBinder
-            mService = binder.getService()
-            mBound = true
+
+            if (service is MediastreamPlayerServiceWithSync.MusicBinder){
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+//                val binder = service as MediastreamPlayerServiceNew.MusicBinder
+                mService = service.service
+                mBound = true
+            }
         }
     }
 
@@ -104,7 +114,7 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
 
             override fun onError(error: String?) {
                 Log.d(TAG, "ERROR_EVENT: $error")
-                Toast.makeText(this@AudioOnDemandAsServiceActivity, error, Toast.LENGTH_LONG).show()
+                Toast.makeText(this@AudioWithSyncServiceActivity, error, Toast.LENGTH_LONG).show()
             }
 
             override fun onNext() {
@@ -196,9 +206,9 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
             }
         }
 
-        MediastreamPlayerService.initializeService(
+        MediastreamPlayerServiceWithSync.initializeService(
             this,
-            this@AudioOnDemandAsServiceActivity,
+            this@AudioWithSyncServiceActivity,
             config,
             container,
             playerView,
@@ -207,12 +217,10 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
             config.accountID?:"",
             mediaStreamPlayerCallBack
         )
-        val intent = Intent(this, MediastreamPlayerService::class.java)
-        intent.action = "$packageName.action.startforeground"
         try {
+            val intent = Intent(this, MediastreamPlayerServiceWithSync::class.java)
             ContextCompat.startForegroundService(this, intent)
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-
+            bindService(intent, connection, BIND_AUTO_CREATE)
         } catch (e: Exception) {
             println("Exception $e")
         }
@@ -230,7 +238,7 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
             config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
             config.trackEnable = false
             config.showControls = true
-            MediastreamPlayerService.getMsPlayer()?.reloadPlayer(config)
+            MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
         }
 
         btnUpdateContent.setOnClickListener {
@@ -246,13 +254,29 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
 
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isEmpty()) {
+            // Empty results are triggered if a permission is requested while another request was already
+            // pending and can be safely ignored in this case.
+            return
+        }
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(applicationContext, R.string.notification_permission_denied, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     override fun onBackPressed() {
         try {
-            stopService(Intent(this, MediastreamPlayerService::class.java))
-            if(mBound){
-                unbindService(connection)
-                ServiceCompat.stopForeground(mService, ServiceCompat.STOP_FOREGROUND_DETACH)
-            }
+            val serviceIntent = Intent(this, MediastreamPlayerServiceWithSync::class.java)
+            serviceIntent.setAction("$packageName.action.stopforeground")
+            startService(serviceIntent)
+            unbindService(connection)
         } catch (e: java.lang.Exception) {
             println("Exception $e")
         }

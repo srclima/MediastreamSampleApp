@@ -29,6 +29,7 @@ class EpisodeAudioAsServiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
         val config = MediastreamPlayerConfig()
+        config.accountID = "5faaeb72f92d7b07dfe10181"
         config.id = "5d4a071c37beb90719a41611"
         config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A

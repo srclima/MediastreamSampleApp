@@ -166,24 +166,23 @@ class LiveAudioAsServiceActivity : AppCompatActivity() {
             }
         }
 
-        try {
-            MediastreamPlayerService.initializeService(
-                this,
-                this@LiveAudioAsServiceActivity,
-                config,
-                container,
-                playerView,
-                miniPlayerConfig,
-                false,
-                config.accountID?:"",
-                mediaStreamPlayerCallBack
-            )
+        MediastreamPlayerService.initializeService(
+            this,
+            this@LiveAudioAsServiceActivity,
+            config,
+            container,
+            playerView,
+            miniPlayerConfig,
+            false,
+            config.accountID?:"",
+            mediaStreamPlayerCallBack
+        )
 
-            val intent = Intent(this, MediastreamPlayerService::class.java)
-            intent.action = "$packageName.action.startforeground"
+        val intent = Intent(this, MediastreamPlayerService::class.java)
+        intent.action = "$packageName.action.startforeground"
+        try {
             ContextCompat.startForegroundService(this, intent)
         } catch (e: Exception) {
-            //Do something here to handle any exception
             println("Exception $e")
         }
     }

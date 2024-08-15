@@ -1,5 +1,6 @@
 package am.mediastre.mediastreamsampleapp.audio
 
+import am.mediastre.mediastreamplatformsdkandroid.MediastreamMiniPlayerConfig
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayer
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerConfig
 import am.mediastre.mediastreamsampleapp.R
@@ -22,13 +23,13 @@ class AudioOnDemandActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_on_demand_player)
+        val miniPlayerConfig = MediastreamMiniPlayerConfig()
+
         val config = MediastreamPlayerConfig()
         config.accountID = "5faaeb72f92d7b07dfe10181"
         config.id = "6516ddeb7f95af089afd3747"
         config.type = MediastreamPlayerConfig.VideoTypes.VOD
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
-        //config.environment = MediastreamPlayerConfig.Environment.DEV
-//        config.adURL = "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/vmap_ad_samples&sz=640x480&cust_params=sample_ar%3Dpremidpostpod&ciu_szs=300x250&gdfp_req=1&ad_rule=1&output=vmap&unviewed_position_start=1&env=vp&impl=s&cmsid=496&vid=short_onecue&correlator="
         config.loadNextAutomatically = true
         config.isDebug = true
         config.trackEnable = true
@@ -38,7 +39,7 @@ class AudioOnDemandActivity : AppCompatActivity() {
 
         progressBarScrub()
 
-        player = MediastreamPlayer(this, config, container, playerView)
+        player = MediastreamPlayer(this, config, container, playerView, miniPlayerConfig)
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

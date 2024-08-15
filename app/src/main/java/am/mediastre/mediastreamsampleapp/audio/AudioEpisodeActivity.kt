@@ -19,8 +19,8 @@ class AudioEpisodeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_episodeplayer)
         val config = MediastreamPlayerConfig()
         config.id = "5d4a071c37beb90719a41611"
+        config.accountID = "5faaeb72f92d7b07dfe10181"
         config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
-        config.environment = MediastreamPlayerConfig.Environment.DEV
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
         config.isDebug = true
         config.loadNextAutomatically = true
