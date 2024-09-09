@@ -60,6 +60,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.activity:activity:1.9.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -116,5 +117,5 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-ima:$mediaVersion")
     implementation("androidx.media3:media3-exoplayer-smoothstreaming:$mediaVersion")*/
 
-    implementation("io.github.mediastream:mediastreamplatformsdkandroid:9.2.3")
+    implementation("io.github.mediastream:mediastreamplatformsdkandroid:9.2.1")
 }

@@ -48,40 +48,56 @@
         <activity
             android:name=".audio.LiveAudioAsServiceActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
-        <activity android:name=".audio.AudioOnDemandAsServiceActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".audio.AudioOnDemandAsServiceActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
-        <activity android:name=".audio.AudioWithSyncServiceActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".audio.AudioWithSyncServiceActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
-        <activity android:name=".audio.EpisodeAudioAsServiceActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".audio.EpisodeAudioAsServiceActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
         <activity
             android:name=".video.VideoLiveActivity"
             android:exported="false" />
         <activity
             android:name=".video.VideoOnDemandActivity"
-            android:supportsPictureInPicture="true"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:exported="false" />
+            android:exported="false"
+            android:supportsPictureInPicture="true" />
         <activity
             android:name=".video.VideoLiveDvrActivity"
             android:exported="false" />
+
         <activity
             android:name=".main.MainActivity"
             android:exported="true"
-            android:theme="@style/SampleApp.DayNight">
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".SplashActivity"
+            android:theme="@style/SampleApp.DayNight"
+            tools:ignore="LockedOrientationActivity">
+
+        </activity>
+        <activity
+            android:name=".SplashActivity"
+            android:configChanges="uiMode"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerService"
-            android:foregroundServiceType="mediaPlayback"/>
 
+        <service
+            android:name="am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerService"
+            android:foregroundServiceType="mediaPlayback" />
         <service
             android:name="am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerServiceWithSync"
             android:exported="true"
@@ -96,8 +112,9 @@
             </intent-filter>
         </service>
 
-        <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="androidx.media3.cast.DefaultCastOptionsProvider"/>
+        <meta-data
+            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="androidx.media3.cast.DefaultCastOptionsProvider" />
 
         <receiver
             android:name="androidx.media3.session.MediaButtonReceiver"
@@ -106,6 +123,7 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
