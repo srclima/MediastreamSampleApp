@@ -40,10 +40,10 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioasserviceplayer)
         val config = MediastreamPlayerConfig()
-        config.id = "67990c9bc0198b98a3d018b3"
+        config.id = "679278d99d4f09f1d67d5826"
         config.accountID = "5faaeb72f92d7b07dfe10181"
         config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
-        config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
+        config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
         config.isDebug = true
         config.trackEnable = false
         config.showControls = true
@@ -240,10 +240,10 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
 
         btnGeo1.setOnClickListener {
             val config = MediastreamPlayerConfig()
-            config.id = "67990c9bc0198b98a3d018b3"
+            config.id = "679278d99d4f09f1d67d5826"
             config.accountID = "5faaeb72f92d7b07dfe10181"
             config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
-            config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
+            config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
             config.trackEnable = false
             config.showControls = true
             MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
