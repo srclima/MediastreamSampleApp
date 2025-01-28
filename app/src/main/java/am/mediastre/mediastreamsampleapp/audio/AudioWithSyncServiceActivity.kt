@@ -249,6 +249,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
             config.showControls = true
             config.appName = "MediastreamAppTest"
             // Configuración de ONDEMAND
+            //config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
             //config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
             //config.id = "679278d99d4f09f1d67d5826"
             MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
