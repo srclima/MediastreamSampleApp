@@ -240,7 +240,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
 
         btnGeo1.setOnClickListener {
             val config = MediastreamPlayerConfig()
-            config.id = "679278d99d4f09f1d67d5826"
+            config.id = "6798dd516d2a75419204aa87"
             config.accountID = "5faaeb72f92d7b07dfe10181"
             config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
             config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
