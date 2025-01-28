@@ -40,8 +40,8 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioasserviceplayer)
         val config = MediastreamPlayerConfig()
-        config.accountID = "5fbfd5b96660885379e1a129"
-        config.id = "646e3d4d5c910108b684a2b0"
+        config.accountID = "5faaeb72f92d7b07dfe10181"
+        config.id = "67990c9bc0198b98a3d018b3"
         config.type = MediastreamPlayerConfig.VideoTypes.VOD
         config.playerType = MediastreamPlayerConfig.PlayerType.AUDIO
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
@@ -91,6 +91,10 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
 
             override fun onReady() {
                 Log.d(TAG, "READY_EVENT")
+            }
+
+            override fun playerViewReady(msplayerView: PlayerView?) {
+                Log.d(TAG, "PLAYER_VIEW_READY")
             }
 
             override fun onEnd() {
@@ -187,6 +191,10 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
                 Log.d(TAG, "PLAYBACK_ERRORS_EVENT$error")
             }
 
+            override fun onPlayerClosed() {
+                Log.d(TAG, "PLAYER_CLOSED")
+            }
+
             override fun onEmbedErrors(error: JSONObject?) {
                 Log.d(TAG, "EMBED_ERRORS_EVENT$error")
             }
@@ -224,8 +232,8 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
 
         btnGeo1.setOnClickListener {
             val config = MediastreamPlayerConfig()
-            config.id = "CONTENT_ID"
-            config.accountID = "ACCOUNT_ID"
+            config.id = "67990c9bc0198b98a3d018b3"
+            config.accountID = "5faaeb72f92d7b07dfe10181"
             config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
             config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
             config.trackEnable = false

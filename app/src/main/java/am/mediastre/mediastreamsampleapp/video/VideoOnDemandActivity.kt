@@ -57,6 +57,11 @@ class VideoOnDemandActivity : AppCompatActivity() {
             override fun onReady() {
                 Log.d(TAG, "mediaStreamPlayerCallBack: onReady")
             }
+
+            override fun playerViewReady(msplayerView: PlayerView?) {
+                Log.d(TAG, "PLAYER_VIEW_READY")
+            }
+
             override fun onEnd() {
                 Log.d(TAG, "mediaStreamPlayerCallBack: onEnd")
             }
@@ -82,6 +87,8 @@ class VideoOnDemandActivity : AppCompatActivity() {
             override fun onCastSessionResumeFailed() {}
             override fun onCastSessionSuspended() {}
             override fun onPlaybackErrors(error: JSONObject?) {}
+            override fun onPlayerClosed() {}
+
             override fun onEmbedErrors(error: JSONObject?) {}
             override fun onLiveAudioCurrentSongChanged(data: JSONObject?) {}
 

@@ -30,7 +30,7 @@ class EpisodeAudioAsServiceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_audioplayer)
         val config = MediastreamPlayerConfig()
         config.accountID = "5faaeb72f92d7b07dfe10181"
-        config.id = "5d4a071c37beb90719a41611"
+        config.id = "67990c9bc0198b98a3d018b3"
         config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
         config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.M4A
         config.isDebug = true
@@ -59,6 +59,10 @@ class EpisodeAudioAsServiceActivity : AppCompatActivity() {
 
             override fun onReady() {
                 Log.d(TAG, "READY_EVENT")
+            }
+
+            override fun playerViewReady(msplayerView: PlayerView?) {
+                Log.d(TAG, "PLAYER_VIEW_READY")
             }
 
             override fun onEnd() {
@@ -153,6 +157,10 @@ class EpisodeAudioAsServiceActivity : AppCompatActivity() {
 
             override fun onPlaybackErrors(error: JSONObject?) {
                 Log.d(TAG, "PLAYBACK_ERRORS_EVENT$error")
+            }
+
+            override fun onPlayerClosed() {
+                Log.d(TAG, "PLAYER_CLOSED")
             }
 
             override fun onEmbedErrors(error: JSONObject?) {

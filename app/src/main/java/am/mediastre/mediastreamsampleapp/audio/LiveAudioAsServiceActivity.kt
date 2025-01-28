@@ -63,6 +63,10 @@ class LiveAudioAsServiceActivity : AppCompatActivity() {
                 Log.d(TAG, "READY_EVENT")
             }
 
+            override fun playerViewReady(msplayerView: PlayerView?) {
+                Log.d(TAG, "PLAYER_VIEW_READY")
+            }
+
             override fun onEnd() {
                 Log.d(TAG, "END_EVENT")
             }
@@ -155,6 +159,10 @@ class LiveAudioAsServiceActivity : AppCompatActivity() {
 
             override fun onPlaybackErrors(error: JSONObject?) {
                 Log.d(TAG, "PLAYBACK_ERRORS_EVENT$error")
+            }
+
+            override fun onPlayerClosed() {
+                Log.d(TAG, "PLAYER_CLOSED")
             }
 
             override fun onEmbedErrors(error: JSONObject?) {
