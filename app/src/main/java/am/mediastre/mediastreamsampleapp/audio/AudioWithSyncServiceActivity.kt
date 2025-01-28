@@ -240,12 +240,17 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
 
         btnGeo1.setOnClickListener {
             val config = MediastreamPlayerConfig()
-            config.id = "6798dd516d2a75419204aa87"
+            // Configuración de LIVE
             config.accountID = "5faaeb72f92d7b07dfe10181"
-            config.type = MediastreamPlayerConfig.VideoTypes.EPISODE
-            config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
+            config.id = "5fada514fc16c006bd63370f"
+            config.type = MediastreamPlayerConfig.VideoTypes.LIVE
+            config.playerType = MediastreamPlayerConfig.PlayerType.AUDIO
             config.trackEnable = false
             config.showControls = true
+            config.appName = "MediastreamAppTest"
+            // Configuración de ONDEMAND
+            //config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.MP3
+            //config.id = "679278d99d4f09f1d67d5826"
             MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
         }
 
