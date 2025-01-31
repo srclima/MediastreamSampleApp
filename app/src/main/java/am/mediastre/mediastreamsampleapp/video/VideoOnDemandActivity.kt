@@ -76,6 +76,8 @@ class VideoOnDemandActivity : AppCompatActivity() {
             override fun onAdEvents(type: AdEvent.AdEventType) {}
             override fun onAdErrorEvent(error: AdError) {}
             override fun onConfigChange(config: MediastreamMiniPlayerConfig?) {}
+            override fun onDismissButton() {}
+
             override fun onCastAvailable(state: Boolean?) {}
             override fun onCastSessionStarting() {}
             override fun onCastSessionStarted() {}

@@ -117,6 +117,10 @@ class LiveAudioAsServiceActivity : AppCompatActivity() {
 
             }
 
+            override fun onDismissButton() {
+                Log.d(TAG, "PLAYER_ON_DISMISS_BUTTON")
+            }
+
             override fun onCastAvailable(state: Boolean?) {
 
             }
