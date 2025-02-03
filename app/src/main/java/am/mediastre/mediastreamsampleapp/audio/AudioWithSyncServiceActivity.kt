@@ -3,6 +3,7 @@ package am.mediastre.mediastreamsampleapp.audio
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamMiniPlayerConfig
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerCallback
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerConfig
+import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerConfig.AudioVideoFormat
 import am.mediastre.mediastreamplatformsdkandroid.MediastreamPlayerServiceWithSync
 import am.mediastre.mediastreamplatformsdkandroid.MessageEvent
 import am.mediastre.mediastreamplatformsdkandroid.UpdateNotificationEvent
@@ -58,9 +59,11 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
 
 
         val config = MediastreamPlayerConfig()
-        // config.accountID = "5faaeb72f92d7b07dfe10181"
-        config.id = "66acf2bacb059b80a95907de"
+        config.accountID = "5faaeb72f92d7b07dfe10181"
+        config.id = "67994704ee0670fe8f1557ed"
         config.type = MediastreamPlayerConfig.VideoTypes.VOD
+        config.startAt = 40
+        config.videoFormat = AudioVideoFormat.MP3
         config.isDebug = true
         config.customPlayerView = playerView
         config.trackEnable = false
