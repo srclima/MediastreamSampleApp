@@ -446,5 +446,11 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         tvBroadcastRemainingTime.text = playerControllerView.getRemainingTimeAsString()
     }
 
+    override fun onDestroy() {
+        progressPlayerHandler.removeCallbacksAndMessages(null)
+        // releaseService()
+        super.onDestroy()
+    }
+
 }
 
