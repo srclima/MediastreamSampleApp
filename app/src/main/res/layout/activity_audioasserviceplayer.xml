@@ -20,6 +20,53 @@
             android:layout_height="match_parent">
         </androidx.media3.ui.PlayerView>
     </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/player_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:background="@color/black_with_opacity"
+        android:orientation="horizontal">
+
+        <!-- Tiempo transcurrido -->
+        <TextView
+            android:id="@+id/tvBroadcastPlayedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:text="--:--"
+            tools:text="0:00" />
+
+        <!-- Espacio entre el tiempo y el control del reproductor -->
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content"/>
+
+        <!-- Controles del reproductor -->
+        <androidx.media3.ui.PlayerControlView
+            android:id="@+id/viewPlayerControllerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:controller_layout_id="@layout/custom_exo_player_control_view"
+            app:show_timeout="0" />
+
+        <!-- Espacio entre el control y el tiempo restante -->
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content"/>
+
+        <!-- Tiempo restante -->
+        <TextView
+            android:id="@+id/tvBroadcastRemainingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:text="--:--"
+            tools:text="12:00" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/buttons_bottom"
         android:layout_width="match_parent"
@@ -52,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:id="@+id/updateContent"
-            android:text="Update notification"/>
+            android:text="Miniplayer"/>
     </LinearLayout>
 
 </LinearLayout>

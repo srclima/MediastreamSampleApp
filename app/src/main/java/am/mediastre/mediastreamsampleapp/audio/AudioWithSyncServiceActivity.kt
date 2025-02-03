@@ -14,29 +14,46 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import androidx.media3.ui.DefaultTimeBar
+import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.TimeBar
 import com.google.ads.interactivemedia.v3.api.AdError
 import com.google.ads.interactivemedia.v3.api.AdEvent
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
+import kotlin.math.absoluteValue
 
 
+@UnstableApi
 class AudioWithSyncServiceActivity : AppCompatActivity() {
 
+    private val progressPlayerHandler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+    private val PLAYER_PROGRESS_BAR_UPDATE_TIME_MILLIS = 1000L
     private val TAG = "SAMUELDEBUG"
     private lateinit var container: FrameLayout
     private lateinit var playerView: PlayerView
     private lateinit var btnPlayOrPause: ImageButton
+    private lateinit var playerControllerView: PlayerControlView
+    private lateinit var tvBroadcastPlayedTime: TextView
+    private lateinit var tvBroadcastRemainingTime: TextView
     //    private var player: MediastreamPlayer? = null
     private lateinit var miniPlayerConfig: MediastreamMiniPlayerConfig
 
@@ -50,6 +67,9 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_audioasserviceplayer)
         playerView = findViewById(R.id.player_view)
         btnPlayOrPause = findViewById(R.id.playOrpause)
+        playerControllerView = findViewById(R.id.viewPlayerControllerView)
+        tvBroadcastPlayedTime = findViewById(R.id.tvBroadcastPlayedTime)
+        tvBroadcastRemainingTime = findViewById(R.id.tvBroadcastRemainingTime)
 
         val vodMediastreamPlayerConfig = createVodMediastreamPlayerConfig()
         container = findViewById(R.id.main_media_frame)
@@ -217,6 +237,13 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
                     .buildAsync()
             controllerFuture.addListener({ setController() }, MoreExecutors.directExecutor())
 
+            Handler(Looper.getMainLooper()).postDelayed({
+                playerControllerView.player = MediastreamPlayerServiceWithSync.getMsPlayer()?.msPlayer
+                progressBarScrub()
+                updatePlayerPlayedTimeAndRemainingTime()
+                handleUpdateMiniplayer()
+            }, 5000)
+
         } catch (e: Exception) {
             println("Exception $e")
         }
@@ -252,17 +279,11 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         btnPlayVod.setOnClickListener {
             val config = createVodMediastreamPlayerConfig()
             MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
+            startProgressPlayerHandler()
         }
 
         btnUpdateContent.setOnClickListener {
-            val miniPlayerConfig = MediastreamMiniPlayerConfig()
-            miniPlayerConfig.songName = "Test overrideCurrentMiniPlayerConfig title"
-            miniPlayerConfig.color = android.graphics.Color.BLACK
-            miniPlayerConfig.albumName = "Test Album name"
-            miniPlayerConfig.description = "Test description for current notification"
-            miniPlayerConfig.imageUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
-            miniPlayerConfig.imageIconUrl = R.drawable.ic_notification_small
-            EventBus.getDefault().post(UpdateNotificationEvent(miniPlayerConfig))
+            handleUpdateMiniplayer()
         }
     }
 
@@ -304,6 +325,17 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleUpdateMiniplayer() {
+        val miniPlayerConfig = MediastreamMiniPlayerConfig()
+        miniPlayerConfig.songName = "Test overrideCurrentMiniPlayerConfig title"
+        miniPlayerConfig.color = android.graphics.Color.BLACK
+        miniPlayerConfig.albumName = "Test Album name"
+        miniPlayerConfig.description = "Test description for current notification"
+        miniPlayerConfig.imageUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
+        miniPlayerConfig.imageIconUrl = R.drawable.ic_notification_small
+        EventBus.getDefault().post(UpdateNotificationEvent(miniPlayerConfig))
+    }
+
     private fun createLiveMediastreamPlayerConfig(): MediastreamPlayerConfig {
         val config = MediastreamPlayerConfig()
         config.accountID = "5faaeb72f92d7b07dfe10181"
@@ -332,4 +364,87 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         config.appName = "MediastreamAppTest"
         return config
     }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun progressBarScrub() {
+        val exoProgress = playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
+        exoProgress?.addListener(object : TimeBar.OnScrubListener{
+            override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                progressPlayerHandler.removeCallbacksAndMessages(null)
+            }
+
+            override fun onScrubMove(timeBar: TimeBar, position: Long) {
+                val playedSeconds = position.div(1000L)
+                tvBroadcastPlayedTime.text =
+                    playedSeconds.secsToHoursMinutesAndSecondsAsString(leadingZeros = false)
+                tvBroadcastRemainingTime.text = playedSeconds
+                    .minus(playerControllerView.getTotalTimeInSeconds())
+                    .coerceAtMost(0L)
+                    .secsToHoursMinutesAndSecondsAsString(leadingZeros = false)
+            }
+
+            override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
+                startProgressPlayerHandler()
+            }
+        })
+    }
+
+    fun Long.secsToHoursMinutesAndSecondsAsString(leadingZeros: Boolean = true): String {
+        val sign = if (this < 0) "-" else ""
+        val realValue = this.absoluteValue
+        val hours = realValue / 3600
+        val minutes = (realValue % 3600) / 60
+        val seconds = realValue % 60
+        return if (hours > 0) {
+            val sHour = if (leadingZeros && hours < 10) "0$hours" else "$hours"
+            val sMinutes = if (minutes < 10) "0$minutes" else "$minutes"
+            val sSeconds = if (seconds < 10) "0$seconds" else "$seconds"
+            "$sign$sHour:$sMinutes:$sSeconds"
+        } else {
+            val sMinutes = if (leadingZeros && minutes < 10) "0$minutes" else "$minutes"
+            val sSeconds = if (seconds < 10) "0$seconds" else "$seconds"
+            "$sign$sMinutes:$sSeconds"
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    fun PlayerControlView.getTotalTimeInSeconds(): Long {
+        return player?.duration?.div(1000L) ?: 0L
+    }
+    @OptIn(UnstableApi::class)
+    fun PlayerControlView.getPlayedTimeAsString(): String {
+        val playedTime = player?.currentPosition?.div(1000L) ?: 0L
+        return playedTime.secsToHoursMinutesAndSecondsAsString(leadingZeros = false)
+    }
+    @OptIn(UnstableApi::class)
+    fun PlayerControlView.getRemainingTimeAsString(): String {
+        val playedTime = player?.currentPosition?.div(1000L) ?: 0L
+        val totalTime = getTotalTimeInSeconds()
+        Log.d("SAMUELDEBUG totalTime", totalTime.toString())
+
+        return if (totalTime == 0L) {
+            0L.secsToHoursMinutesAndSecondsAsString(leadingZeros = false)
+        } else {
+            (playedTime - totalTime).secsToHoursMinutesAndSecondsAsString(leadingZeros = false)
+        }
+    }
+
+    private fun startProgressPlayerHandler() {
+        progressPlayerHandler.postDelayed(object : Runnable {
+            override fun run() {
+                updatePlayerPlayedTimeAndRemainingTime()
+                progressPlayerHandler.postDelayed(
+                    this,
+                    PLAYER_PROGRESS_BAR_UPDATE_TIME_MILLIS
+                )
+            }
+        }, PLAYER_PROGRESS_BAR_UPDATE_TIME_MILLIS)
+    }
+
+    private fun updatePlayerPlayedTimeAndRemainingTime() {
+        tvBroadcastPlayedTime.text = playerControllerView.getPlayedTimeAsString()
+        tvBroadcastRemainingTime.text = playerControllerView.getRemainingTimeAsString()
+    }
+
 }
+
