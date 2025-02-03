@@ -48,7 +48,10 @@ class LiveAudioAsServiceActivity : AppCompatActivity() {
     }
 
     private fun startService(config: MediastreamPlayerConfig){
-        miniPlayerConfig = MediastreamMiniPlayerConfig()
+        miniPlayerConfig = MediastreamMiniPlayerConfig().apply {
+            imageIconUrl = R.drawable.ic_notification_small
+            color = ContextCompat.getColor(this@LiveAudioAsServiceActivity, R.color.colorOrange)
+        }
 
         val mediaStreamPlayerCallBack = object : MediastreamPlayerCallback {
             override fun onPlay() {
