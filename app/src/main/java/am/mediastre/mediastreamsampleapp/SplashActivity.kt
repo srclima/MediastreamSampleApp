@@ -21,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
             val intent = Intent(this@SplashActivity, MainActivity::class.java)
             startActivity(intent)
             finish() // Termina la SplashActivity
-        }, 5000) // 5000 milisegundos = 5 segundos
+        }, 2000) // 5000 milisegundos = 5 segundos
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

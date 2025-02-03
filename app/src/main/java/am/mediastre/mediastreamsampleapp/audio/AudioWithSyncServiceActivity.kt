@@ -9,20 +9,15 @@ import am.mediastre.mediastreamplatformsdkandroid.MessageEvent
 import am.mediastre.mediastreamplatformsdkandroid.UpdateNotificationEvent
 import am.mediastre.mediastreamsampleapp.R
 import android.Manifest
-import android.app.ActivityManager
 import android.content.ComponentName
-import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.session.MediaController
@@ -34,16 +29,14 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
-import java.io.File
-import java.io.IOException
-import java.util.Objects
 
 
 class AudioWithSyncServiceActivity : AppCompatActivity() {
 
-    private val TAG = "SampleApp"
+    private val TAG = "SAMUELDEBUG"
     private lateinit var container: FrameLayout
     private lateinit var playerView: PlayerView
+    private lateinit var btnPlayOrPause: ImageButton
     //    private var player: MediastreamPlayer? = null
     private lateinit var miniPlayerConfig: MediastreamMiniPlayerConfig
 
@@ -56,19 +49,9 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioasserviceplayer)
         playerView = findViewById(R.id.player_view)
+        btnPlayOrPause = findViewById(R.id.playOrpause)
 
-
-        val config = MediastreamPlayerConfig()
-        config.accountID = "5faaeb72f92d7b07dfe10181"
-        config.id = "67994704ee0670fe8f1557ed"
-        config.type = MediastreamPlayerConfig.VideoTypes.VOD
-        config.startAt = 40
-        config.videoFormat = AudioVideoFormat.MP3
-        config.isDebug = true
-        config.customPlayerView = playerView
-        config.trackEnable = false
-        config.loadNextAutomatically = true
-        config.appName = "MediastreamAppTest"
+        val vodMediastreamPlayerConfig = createVodMediastreamPlayerConfig()
         container = findViewById(R.id.main_media_frame)
 
         if (
@@ -80,17 +63,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         }
 
         setupButtons()
-        startService(config)
-    }
-
-    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
-        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-            if (serviceClass.name == service.service.className) {
-                return true
-            }
-        }
-        return false
+        startService(vodMediastreamPlayerConfig)
     }
 
     private fun startService(config: MediastreamPlayerConfig){
@@ -102,10 +75,12 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
             }
             override fun onPlay() {
                 Log.d(TAG, "PLAY_EVENT")
+                btnPlayOrPause.setImageResource(android.R.drawable.ic_media_pause)
             }
 
             override fun onPause() {
                 Log.d(TAG, "PAUSE_EVENT")
+                btnPlayOrPause.setImageResource(android.R.drawable.ic_media_play)
             }
 
             override fun onReady() {
@@ -122,6 +97,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
 
             override fun onBuffering() {
                 Log.d(TAG, "BUFFERING_EVENT")
+                btnPlayOrPause.setImageResource(R.drawable.ic_loading)
             }
 
 
@@ -233,10 +209,6 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
             mediaStreamPlayerCallBack
         )
         try {
-            /*val intent = Intent(this, MediastreamPlayerServiceWithSync::class.java)
-            ContextCompat.startForegroundService(this, intent)
-            bindService(intent, connection, BIND_AUTO_CREATE)*/
-
             controllerFuture =
                 MediaController.Builder(
                     this,
@@ -258,17 +230,27 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        val btnGeo1 = findViewById<Button>(R.id.geo1)
+        val btnPlayLive = findViewById<Button>(R.id.playLive)
+        val btnPlayVod = findViewById<Button>(R.id.playVod)
         val btnUpdateContent = findViewById<Button>(R.id.updateContent)
 
-        btnGeo1.setOnClickListener {
-            val config = MediastreamPlayerConfig()
-            config.id = "5fada514fc16c006bd63370f"
-            config.type = MediastreamPlayerConfig.VideoTypes.LIVE
-            config.videoFormat = MediastreamPlayerConfig.AudioVideoFormat.DEFAULT
-            config.trackEnable = false
-            config.showControls = true
-            config.adURL = "/"
+        btnPlayOrPause.setOnClickListener {
+            MediastreamPlayerServiceWithSync.getMsPlayer()?.let { msPlayer ->
+                if (msPlayer.isPlaying()) {
+                    msPlayer.pause()
+                } else {
+                    msPlayer.play()
+                }
+            }
+        }
+
+        btnPlayLive.setOnClickListener {
+            val config = createLiveMediastreamPlayerConfig()
+            MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
+        }
+
+        btnPlayVod.setOnClickListener {
+            val config = createVodMediastreamPlayerConfig()
             MediastreamPlayerServiceWithSync.getMsPlayer()?.reloadPlayer(config)
         }
 
@@ -279,7 +261,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
             miniPlayerConfig.albumName = "Test Album name"
             miniPlayerConfig.description = "Test description for current notification"
             miniPlayerConfig.imageUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
-            miniPlayerConfig.imageIconUrl = androidx.media3.ui.R.drawable.exo_notification_stop
+            miniPlayerConfig.imageIconUrl = R.drawable.ic_notification_small
             EventBus.getDefault().post(UpdateNotificationEvent(miniPlayerConfig))
         }
     }
@@ -311,7 +293,6 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         playerView.player?.release()
         playerView.player = null
         releaseController()
-//        unbindService(connection)
         val stopIntent = Intent(this, MediastreamPlayerServiceWithSync::class.java)
         stopIntent.action = "STOP_SERVICE"
         startService(stopIntent)
@@ -321,5 +302,34 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         if (::controllerFuture.isInitialized){
             MediaController.releaseFuture(controllerFuture)
         }
+    }
+
+    private fun createLiveMediastreamPlayerConfig(): MediastreamPlayerConfig {
+        val config = MediastreamPlayerConfig()
+        config.accountID = "5faaeb72f92d7b07dfe10181"
+        config.id = "5fada514fc16c006bd63370f"
+        config.type = MediastreamPlayerConfig.VideoTypes.LIVE
+        config.videoFormat = AudioVideoFormat.DEFAULT
+        config.isDebug = true
+        config.customPlayerView = playerView
+        config.trackEnable = false
+        config.showControls = true
+        config.adURL = "/"
+        return config
+    }
+
+    private fun createVodMediastreamPlayerConfig(): MediastreamPlayerConfig {
+        val config = MediastreamPlayerConfig()
+        config.accountID = "5faaeb72f92d7b07dfe10181"
+        config.id = "67994704ee0670fe8f1557ed"
+        config.type = MediastreamPlayerConfig.VideoTypes.VOD
+        config.startAt = 40
+        config.videoFormat = AudioVideoFormat.MP3
+        config.isDebug = true
+        config.customPlayerView = playerView
+        config.trackEnable = false
+        config.loadNextAutomatically = true
+        config.appName = "MediastreamAppTest"
+        return config
     }
 }

@@ -231,7 +231,7 @@ class AudioOnDemandAsServiceActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        val btnGeo1 = findViewById<Button>(R.id.geo1)
+        val btnGeo1 = findViewById<Button>(R.id.playVod)
         val btnUpdateContent = findViewById<Button>(R.id.updateContent)
 
         btnGeo1.setOnClickListener {
