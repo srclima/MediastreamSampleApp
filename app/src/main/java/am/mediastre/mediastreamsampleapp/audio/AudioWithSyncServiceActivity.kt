@@ -360,7 +360,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
         config.isDebug = true
         config.customPlayerView = playerView
         config.trackEnable = false
-        config.loadNextAutomatically = true
+        config.loadNextAutomatically = false
         config.appName = "MediastreamAppTest"
         return config
     }
@@ -409,7 +409,7 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
 
     @OptIn(UnstableApi::class)
     fun PlayerControlView.getTotalTimeInSeconds(): Long {
-        return player?.duration?.div(1000L) ?: 0L
+        return player?.contentDuration?.div(1000L) ?: 0L
     }
     @OptIn(UnstableApi::class)
     fun PlayerControlView.getPlayedTimeAsString(): String {
@@ -420,7 +420,6 @@ class AudioWithSyncServiceActivity : AppCompatActivity() {
     fun PlayerControlView.getRemainingTimeAsString(): String {
         val playedTime = player?.currentPosition?.div(1000L) ?: 0L
         val totalTime = getTotalTimeInSeconds()
-        Log.d("SAMUELDEBUG totalTime", totalTime.toString())
 
         return if (totalTime == 0L) {
             0L.secsToHoursMinutesAndSecondsAsString(leadingZeros = false)
